@@ -3,3 +3,5 @@ __pycache__/
 requirements.txt
 *egg-info
 venv
+.env
+.env.local

@@ -107,3 +107,121 @@ Since Firebase Functions still expects `functions/requirements.txt`, we need to 
 ```bash
 make freeze
 ```
+
+## CLI Structure for Implementation Project
+
+### Add `functions/.env` and `functions/.env.local`
+
+* Do **not** commit these files into the repository.
+* These files **must** exist in the directory during deployment.
+* `.env.local` will be loaded when using Firebase Functions Emulator, but **not** in production.
+
+```.env
+# functions/.env
+TZ=Asia/Taipei
+PROJECT_ID=
+PRIVATE_KEY=
+CLIENT_EMAIL=
+API_KEY=
+AUTH_DOMAIN=
+STORAGE_BUCKET=
+MESSAGING_SENDER_ID=
+APP_ID=
+MEASUREMENT_ID=
+DATABASE_URL=
+HMAC_SIGNING_KEY=
+```
+
+```.env
+# functions/.env.local
+PUBSUB_EMULATOR_HOST=localhost:8085
+```
+
+> Remember to add `.env` and `.env.local` to `.gitignore`
+
+---
+
+### Create CLI using `typer`
+
+We use `typer` for building the CLI because of its decorator-based API.
+Here, we structure it using an `__init__.py`-style entrypoint.
+
+Initial setup:
+
+```python
+from typer import Typer
+from click.core import Context
+from crawler_kit.utils.asyncio import ensure_event_loop
+
+
+def callback(context: Context):
+    loop = ensure_event_loop()
+    # context.obj = loop.run_until_complete(startup())
+    # register(lambda: loop.run_until_complete(shutdown()))
+
+
+app = Typer(callback=callback)
+```
+
+We use `ensure_event_loop` to prepare for running async functions.
+
+---
+
+### Add Your First CLI Command
+
+1. Create `functions/crawler_kit/entrypoints/cli/typer/greet/__init__.py`:
+
+```python
+from typer import Typer
+
+greet = Typer(name="greet")
+```
+
+2. Implement `functions/crawler_kit/modules/greet/presentation/cli/handlers/handle_hello.py`:
+
+```python
+from click.core import Context
+
+
+def handle_hello(context: Context):
+    print("hello, world")
+```
+
+3. Register the handler in `functions/crawler_kit/entrypoints/cli/typer/greet/__init__.py`:
+
+```python
+from typer import Typer
+from crawler_kit.modules.greet.presentation.cli.handlers.handle_hello import (
+    handle_hello,
+)
+
+greet = Typer(name="greet")
+greet.command(name="hello")(handle_hello)
+```
+
+4. Register the `greet` CLI module in `functions/crawler_kit/entrypoints/cli/typer/__init__.py`:
+
+```python
+from typer import Typer
+from click.core import Context
+from crawler_kit.utils.asyncio import ensure_event_loop
+from crawler_kit.entrypoints.cli.typer.greet import greet
+
+
+def callback(context: Context):
+    loop = ensure_event_loop()
+    # context.obj = loop.run_until_complete(startup())
+    # register(lambda: loop.run_until_complete(shutdown()))
+
+
+app = Typer(callback=callback)
+app.add_typer(greet)
+```
+
+---
+
+### Run the CLI
+
+```bash
+python functions/main.py greet hello
+```
