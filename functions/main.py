@@ -13,6 +13,21 @@ if __name__ == "__main__":
     app()
 
 else:
+    from firebase_functions.https_fn import on_request
+    from werkzeug.wrappers import Request
+    from vellox import Vellox
+    from crawler_kit.entrypoints.http.starlette import app
+    from crawler_kit.utils.asyncio import ensure_event_loop
+
+    vellox = Vellox(
+        app=app,
+    )
+
+    @on_request()
+    def handle_request(request: Request):
+        loop = ensure_event_loop()
+        return loop.run_until_complete(vellox(request))
+
     from firebase_functions.pubsub_fn import (
         on_message_published,
         CloudEvent,

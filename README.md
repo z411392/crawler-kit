@@ -448,3 +448,57 @@ greet.command(name="world")(handle_world)
 ```bash
 python functions/main.py greet hello
 ```
+
+## Add HTTP Endpoint
+
+### Add `functions/crawler_kit/entrypoints/http/starlette/__init__.py`
+
+```python
+from starlette.applications import Starlette
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
+
+
+middleware = [
+    Middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_methods=["*"],
+        allow_headers=["*"],
+    ),
+]
+
+routes = []
+
+app = Starlette(
+    middleware=middleware,
+    lifespan=None,
+    routes=routes,
+    debug=False,
+)
+```
+
+### Register the request handler in `functions/main.py`
+
+```python
+else:
+    from firebase_functions.https_fn import on_request
+    from werkzeug.wrappers import Request
+    from vellox import Vellox
+    from crawler_kit.entrypoints.http.starlette import app
+    from crawler_kit.utils.asyncio import ensure_event_loop
+
+    vellox = Vellox(
+        app=app,
+    )
+
+    @on_request()
+    def handle_request(request: Request):
+        loop = ensure_event_loop()
+        return loop.run_until_complete(vellox(request))
+```
+
+### Next steps:
+
+* Define the `lifespan`, typically for initializing and releasing dependencies (DI).
+* Define individual routes.
