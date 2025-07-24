@@ -21,7 +21,7 @@ format:
 	@uvx ruff format .
 
 dev:
-	@firebase emulators:start --only functions
+	@firebase emulators:start --only functions,pubsub
 
 lint:
 	@uvx ruff check .

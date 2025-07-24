@@ -225,3 +225,80 @@ app.add_typer(greet)
 ```bash
 python functions/main.py greet hello
 ```
+
+Here's the English translation of your guide:
+
+---
+
+## Publish Message Demo
+
+### Create `functions/crawler_kit/utils/google_cloud/publish_message.py`:
+
+```python
+from google.cloud.pubsub import PublisherClient
+from crawler_kit.utils.google_cloud.credentials_from_env import credentials_from_env
+from json import dumps
+from asyncio import Future
+from google.api_core.exceptions import AlreadyExists
+from os import getenv
+
+def publish_message(topic: str, payload: dict):
+    pubsub = PublisherClient(credentials=credentials_from_env())
+    name = str(f"projects/{getenv('PROJECT_ID')}/topics/{topic}")
+    try:
+        pubsub.create_topic(
+            request=dict(name=name),
+        )
+    except AlreadyExists:
+        pass
+    data = bytes(dumps(payload), "utf-8")
+    future: Future = pubsub.publish(name, data)
+    return future.result()
+```
+
+### Implementation of `credentials_from_env` (`functions/crawler_kit/utils/google_cloud/credentials_from_env.py`):
+
+```python
+from google.oauth2.service_account import Credentials
+from os import getenv
+
+def credentials_from_env():
+    credentials = Credentials.from_service_account_info(
+        dict(
+            type="service_account",
+            project_id=getenv("PROJECT_ID"),
+            client_email=getenv("CLIENT_EMAIL"),
+            private_key=getenv("PRIVATE_KEY"),
+            token_uri="https://oauth2.googleapis.com/token",
+        )
+    )
+    return credentials
+```
+
+### Slight modification to `functions/crawler_kit/modules/greet/presentation/cli/handlers/handle_hello.py`:
+
+```python
+from click.core import Context
+from crawler_kit.utils.google_cloud.publish_message import publish_message
+
+def handle_hello(context: Context):
+    topic = "test"
+    payload = dict(message="hello, world")
+    print(publish_message(topic, payload))
+```
+
+### Verify the functionality
+
+Before testing, make sure the Pub/Sub emulator is running:
+
+```bash
+make dev
+```
+
+### Run the test
+
+```bash
+python functions/main.py greet hello
+```
+
+If it runs successfully, you'll see a number in the output. That number is the message ID assigned by the emulator. If the emulator is restarted, it will reset the counter.
