@@ -1,0 +1,63 @@
+[project]
+name = "crawler-kit"
+version = "0.1.0"
+description = ""
+
+requires-python = ">=3.13,<3.14"
+dependencies = [
+  "python-dotenv",
+  "httpx",
+  "prefect",
+  "google-cloud-pubsub",
+  "google-cloud-run",
+]
+
+[project.optional-dependencies]
+firebase = [
+  "starlette",
+  "vellox",
+  "firebase_functions",
+  "asgi-lifespan",
+]
+
+cli = [
+  "firebase-admin",
+  "typer",
+  "pyppeteer",
+  "uvicorn",
+  "starlette",
+]
+
+dev = [
+  "pytest",
+  "pytest-testdox",
+  "pytest-dotenv",
+  "pytest-asyncio",
+]
+
+[tool.pytest.ini_options]
+addopts = [
+  "-v",
+  "-s",
+  "--testdox",
+  "--capture=no",
+  "--tb=long",
+]
+asyncio_mode = "auto"
+filterwarnings = [
+  "ignore::pytest.PytestAssertRewriteWarning",
+  "ignore:builtin type SwigPyPacked has no __module__ attribute",
+  "ignore:builtin type SwigPyObject has no __module__ attribute",
+  "ignore:builtin type swigvarlink has no __module__ attribute",
+]
+norecursedirs = [
+  ".*",
+  "build",
+  "dist",
+  "*.egg",
+  "info",
+]
+python_files = [
+  "test_*.py",
+]
+pythonpath = ["./functions"]

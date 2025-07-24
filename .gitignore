@@ -1,0 +1,5 @@
+__pycache__/
+*.local
+requirements.txt
+*egg-info
+venv
