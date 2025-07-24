@@ -112,9 +112,9 @@ make freeze
 
 ### Add `functions/.env` and `functions/.env.local`
 
-* Do **not** commit these files into the repository.
-* These files **must** exist in the directory during deployment.
-* `.env.local` will be loaded when using Firebase Functions Emulator, but **not** in production.
+-   Do **not** commit these files into the repository.
+-   These files **must** exist in the directory during deployment.
+-   `.env.local` will be loaded when using Firebase Functions Emulator, but **not** in production.
 
 ```.env
 # functions/.env
@@ -330,7 +330,7 @@ else:
 ```
 
 📝 **Note:** After the emulator starts, it will import the functions from `functions/main.py` to run them.
-You can simply think of `__name__ != "__main__"` as the condition when `main.py` is executed *inside* the emulator.
+You can simply think of `__name__ != "__main__"` as the condition when `main.py` is executed _inside_ the emulator.
 
 At this point, `.env` and `.env.local` will be loaded automatically by the emulator and production environments.
 They are ignored from the file system, so you **do not need to** and **should not** use `dotenv` to load them manually.
@@ -346,6 +346,105 @@ python functions/main.py greet hello
 You should see output like:
 
 ```txt
-i  functions: Beginning execution of "us-central1-on_snapshot_uploaded"
 >  {'message': 'hello, world'}
+```
+
+## Simulating and Running a Cloud Run Job
+
+### Add `functions/crawler_kit/utils/google_cloud/run_job.py`
+
+```python
+from crawler_kit.utils.environments import is_emulating
+from subprocess import Popen, PIPE
+from os import getenv
+from crawler_kit.utils.google_cloud.credentials_from_env import (
+    credentials_from_env,
+)
+from google.cloud.run_v2 import JobsClient
+from google.cloud.run_v2 import RunJobRequest
+
+
+def run_job(
+    *args,
+):
+    if is_emulating():
+        process = Popen(["python", "main.py", *args], stdout=PIPE, text=True)
+        for line in process.stdout:
+            print(line, end="")
+        if process.returncode == 0:
+            return
+        if process.stderr is None:
+            return
+        raise Exception(process.stderr)
+
+    jobs_client = JobsClient(credentials=credentials_from_env())
+    job_name = "worker"
+    location = "us-central1"
+    container_override = RunJobRequest.Overrides.ContainerOverride()
+    container_override.args.extend(args)
+    overrides = RunJobRequest.Overrides()
+    overrides.container_overrides = [container_override]
+    name = f"projects/{getenv('PROJECT_ID')}/locations/{location}/jobs/{job_name}"
+    operation = jobs_client.run_job(
+        request=RunJobRequest(
+            name=name,
+            overrides=overrides,
+        )
+    )
+    return operation
+```
+
+> You must manually set `job_name = "worker"` and `location = "us-central1"` to match your configuration.
+
+Modify the Firebase Function in `functions/main.py` to execute a Cloud Run job:
+
+```python
+else:
+    from firebase_functions.pubsub_fn import (
+        on_message_published,
+        CloudEvent,
+        MessagePublishedData,
+    )
+    from os import getenv
+    from crawler_kit.utils.google_cloud.run_job import run_job
+
+    @on_message_published(topic=f"projects/{getenv('PROJECT_ID')}/topics/test")
+    def on_test_message_received(
+        event: CloudEvent[MessagePublishedData],
+    ):
+        run_job("greet", "world", event.data.message.json["message"])
+```
+
+### Add the corresponding command
+
+#### `functions/crawler_kit/modules/greet/presentation/cli/handlers/handle_world.py`
+
+```python
+from click.core import Context
+
+
+def handle_world(context: Context, message: str):
+    print(message)
+```
+
+#### `functions/crawler_kit/entrypoints/cli/typer/greet/__init__.py`
+
+```python
+from typer import Typer
+from crawler_kit.modules.greet.presentation.cli.handlers.handle_hello import (
+    handle_hello,
+)
+from crawler_kit.modules.greet.presentation.cli.handlers.handle_world import (
+    handle_world,
+)
+
+greet = Typer(name="greet")
+greet.command(name="hello")(handle_hello)
+greet.command(name="world")(handle_world)
+```
+
+### Verification
+
+```bash
+python functions/main.py greet hello
 ```

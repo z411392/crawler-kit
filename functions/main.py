@@ -19,9 +19,10 @@ else:
         MessagePublishedData,
     )
     from os import getenv
+    from crawler_kit.utils.google_cloud.run_job import run_job
 
     @on_message_published(topic=f"projects/{getenv('PROJECT_ID')}/topics/test")
     def on_test_message_received(
         event: CloudEvent[MessagePublishedData],
     ):
-        print(event.data.message.json)
+        run_job("greet", "world", event.data.message.json["message"])

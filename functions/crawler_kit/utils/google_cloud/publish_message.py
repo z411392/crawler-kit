@@ -5,6 +5,7 @@ from asyncio import Future
 from google.api_core.exceptions import AlreadyExists
 from os import getenv
 
+
 def publish_message(topic: str, payload: dict):
     pubsub = PublisherClient(credentials=credentials_from_env())
     name = str(f"projects/{getenv('PROJECT_ID')}/topics/{topic}")
