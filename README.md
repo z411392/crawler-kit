@@ -295,6 +295,8 @@ Before testing, make sure the Pub/Sub emulator is running:
 make dev
 ```
 
+> Remember add `*.log` to `.gitignore`
+
 ### Run the test
 
 ```bash
@@ -302,3 +304,48 @@ python functions/main.py greet hello
 ```
 
 If it runs successfully, you'll see a number in the output. That number is the message ID assigned by the emulator. If the emulator is restarted, it will reset the counter.
+
+Here's the English translation of your content:
+
+---
+
+## Subscribe to a Topic via Firebase Function
+
+Add the following to `functions/main.py`:
+
+```python
+else:
+    from firebase_functions.pubsub_fn import (
+        on_message_published,
+        CloudEvent,
+        MessagePublishedData,
+    )
+    from os import getenv
+
+    @on_message_published(topic=f"projects/{getenv('PROJECT_ID')}/topics/test")
+    def on_snapshot_uploaded(
+        event: CloudEvent[MessagePublishedData],
+    ):
+        print(event.data.message.json)
+```
+
+📝 **Note:** After the emulator starts, it will import the functions from `functions/main.py` to run them.
+You can simply think of `__name__ != "__main__"` as the condition when `main.py` is executed *inside* the emulator.
+
+At this point, `.env` and `.env.local` will be loaded automatically by the emulator and production environments.
+They are ignored from the file system, so you **do not need to** and **should not** use `dotenv` to load them manually.
+
+---
+
+### ✅ Verification
+
+```python
+python functions/main.py greet hello
+```
+
+You should see output like:
+
+```txt
+i  functions: Beginning execution of "us-central1-on_snapshot_uploaded"
+>  {'message': 'hello, world'}
+```
