@@ -1,3 +1,10 @@
+## Prerequisites
+
+* Install `make` (preferably a version that supports `.ONESHELL`)
+* Install Firebase CLI
+* Install `uv`
+
+
 ## Initialize the Project
 
 ### Initialize Firebase
@@ -79,7 +86,7 @@ source functions/venv/bin/activate
 
 ### Make `.vscode` Recognize the Virtual Environment
 
-Create `.vscode/settings.json`:
+Create [`.vscode/settings.json`](./.vscode/settings.json):
 
 ```json
 {
@@ -88,7 +95,7 @@ Create `.vscode/settings.json`:
 }
 ```
 
-### Create `pyproject.toml`
+### Create [pyproject.toml](./pyproject.toml)
 
 -   Add a new `pyproject.toml`
 -   Add `venv`, `*egg-info` and `requirements.txt` to `.gitignore`
@@ -100,7 +107,7 @@ Create `.vscode/settings.json`:
 make install
 ```
 
-### Generate `requirements.txt`
+### Generate [requirements.txt](./functions/requirements.txt)
 
 Since Firebase Functions still expects `functions/requirements.txt`, we need to manually generate this file:
 
@@ -110,7 +117,7 @@ make freeze
 
 ## CLI Structure for Implementation Project
 
-### Add `functions/.env` and `functions/.env.local`
+### Add [functions/.env](./functions/.env) and [functions/.env.local](./functions/.env.local)
 
 -   Do **not** commit these files into the repository.
 -   These files **must** exist in the directory during deployment.
@@ -169,7 +176,7 @@ We use `ensure_event_loop` to prepare for running async functions.
 
 ### Add Your First CLI Command
 
-1. Create `functions/crawler_kit/entrypoints/cli/typer/greet/__init__.py`:
+1. Create [`typer/greet/__init__.py`](./functions/crawler_kit/entrypoints/cli/typer/greet/__init__.py):
 
 ```python
 from typer import Typer
@@ -177,7 +184,7 @@ from typer import Typer
 greet = Typer(name="greet")
 ```
 
-2. Implement `functions/crawler_kit/modules/greet/presentation/cli/handlers/handle_hello.py`:
+2. Implement [`modules/greet/presentation/cli/handlers/handle_hello.py`](./functions/crawler_kit/modules/greet/presentation/cli/handlers/handle_hello.py):
 
 ```python
 from click.core import Context
@@ -187,7 +194,7 @@ def handle_hello(context: Context):
     print("hello, world")
 ```
 
-3. Register the handler in `functions/crawler_kit/entrypoints/cli/typer/greet/__init__.py`:
+3. Register the handler in [`typer/greet/__init__.py`](./functions/crawler_kit/entrypoints/cli/typer/greet/__init__.py):
 
 ```python
 from typer import Typer
@@ -232,7 +239,7 @@ Here's the English translation of your guide:
 
 ## Publish Message Demo
 
-### Create `functions/crawler_kit/utils/google_cloud/publish_message.py`:
+### Create [`utils/google_cloud/publish_message.py`](./functions/crawler_kit/utils/google_cloud/publish_message.py):
 
 ```python
 from google.cloud.pubsub import PublisherClient
@@ -256,7 +263,7 @@ def publish_message(topic: str, payload: dict):
     return future.result()
 ```
 
-### Implementation of `credentials_from_env` (`functions/crawler_kit/utils/google_cloud/credentials_from_env.py`):
+### Implementation of [`credentials_from_env`](./functions/crawler_kit/utils/google_cloud/credentials_from_env.py):
 
 ```python
 from google.oauth2.service_account import Credentials
@@ -275,7 +282,7 @@ def credentials_from_env():
     return credentials
 ```
 
-### Slight modification to `functions/crawler_kit/modules/greet/presentation/cli/handlers/handle_hello.py`:
+### Slight modification to [`modules/greet/presentation/cli/handlers/handle_hello.py`](./functions/crawler_kit/modules/greet/presentation/cli/handlers/handle_hello.py):
 
 ```python
 from click.core import Context
@@ -351,7 +358,30 @@ You should see output like:
 
 ## Simulating and Running a Cloud Run Job
 
-### Add `functions/crawler_kit/utils/google_cloud/run_job.py`
+### Add [`utils/environments.py`](./functions/crawler_kit/utils/environments.py)
+
+```python
+from os import getenv, environ
+
+
+def is_emulating():
+    return getenv("FUNCTIONS_EMULATOR") == "true"
+
+
+def is_testing():
+    return "PYTEST_CURRENT_TEST" in environ
+
+
+def is_developing():
+    return is_testing() or is_emulating()
+
+
+def is_cli():
+    return "RUN_MODE" in environ and environ["RUN_MODE"] == "cli"
+
+```
+
+### Add [`utils/google_cloud/run_job.py`](./functions/crawler_kit/utils/google_cloud/run_job.py)
 
 ```python
 from crawler_kit.utils.environments import is_emulating
@@ -417,7 +447,7 @@ else:
 
 ### Add the corresponding command
 
-#### `functions/crawler_kit/modules/greet/presentation/cli/handlers/handle_world.py`
+#### [`modules/greet/presentation/cli/handlers/handle_world.py`](./functions/crawler_kit/modules/greet/presentation/cli/handlers/handle_world.py)
 
 ```python
 from click.core import Context
@@ -427,7 +457,7 @@ def handle_world(context: Context, message: str):
     print(message)
 ```
 
-#### `functions/crawler_kit/entrypoints/cli/typer/greet/__init__.py`
+#### [`typer/greet/__init__.py`](./functions/crawler_kit/entrypoints/cli/typer/greet/__init__.py)
 
 ```python
 from typer import Typer
@@ -451,7 +481,7 @@ python functions/main.py greet hello
 
 ## Add HTTP Endpoint
 
-### Add `functions/crawler_kit/entrypoints/http/starlette/__init__.py`
+### Add [http/starlette/__init__.py](./functions/crawler_kit/entrypoints/http/starlette/__init__.py)
 
 ```python
 from starlette.applications import Starlette
@@ -500,5 +530,5 @@ else:
 
 ### Next steps:
 
-* Define the `lifespan`, typically for initializing and releasing dependencies (DI).
-* Define individual routes.
+-   Define the `lifespan`, typically for initializing and releasing dependencies (DI).
+-   Define individual routes.

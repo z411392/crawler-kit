@@ -1,5 +1,4 @@
 export UV_PROJECT_ENVIRONMENT=functions/venv
-# export IMAGE_REPOSITORY=""
 
 .PHONY: \
 	dev \
@@ -9,11 +8,7 @@ export UV_PROJECT_ENVIRONMENT=functions/venv
 	deploy \
 	install \
 	tree \
-	freeze \
-	keygen \
-	help \
-	build \
-	push
+	freeze
 
 
 
