@@ -1,7 +1,8 @@
 from typer import Typer
 from click.core import Context
-from crawler_kit.utils.asyncio import ensure_event_loop
-from crawler_kit.entrypoints.cli.typer.greet import greet
+from crawler_kit.entrypoints.utils.asyncio import ensure_event_loop
+from crawler_kit.entrypoints.cli.greet import greet
+from crawler_kit.entrypoints.cli.crawler import crawler
 
 
 def callback(context: Context):
@@ -12,3 +13,4 @@ def callback(context: Context):
 
 app = Typer(callback=callback)
 app.add_typer(greet)
+app.add_typer(crawler)
