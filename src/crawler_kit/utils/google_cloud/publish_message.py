@@ -3,12 +3,12 @@ from crawler_kit.utils.google_cloud.credentials_from_env import credentials_from
 from json import dumps
 from asyncio import Future
 from google.api_core.exceptions import AlreadyExists
-from os import getenv
+from crawler_kit.modules.general.enums.topic import Topic
 
 
-def publish_message(topic: str, payload: dict):
+def publish_message(topic: Topic, payload: dict):
     pubsub = PublisherClient(credentials=credentials_from_env())
-    name = str(f"projects/{getenv('PROJECT_ID')}/topics/{topic}")
+    name = str(topic)
     try:
         pubsub.create_topic(
             request=dict(name=name),
