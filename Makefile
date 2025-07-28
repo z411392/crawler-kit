@@ -1,4 +1,4 @@
-export UV_PROJECT_ENVIRONMENT=functions/venv
+export UV_PROJECT_ENVIRONMENT=src/venv
 
 .PHONY: \
 	dev \

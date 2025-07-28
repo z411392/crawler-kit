@@ -1,4 +1,4 @@
 {
-    "python.venvPath": "functions/venv",
-    "python.defaultInterpreterPath": "functions/venv/bin/python"
+    "python.venvPath": "src/venv",
+    "python.defaultInterpreterPath": "src/venv/bin/python"
 }
