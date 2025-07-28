@@ -212,7 +212,7 @@ greet.command(name="hello")(handle_hello)
 from typer import Typer
 from click.core import Context
 from crawler_kit.utils.asyncio import ensure_event_loop
-from crawler_kit.entrypoints.cli.typer.greet import greet
+from crawler_kit.entrypoints.cli.greet import greet
 
 
 def callback(context: Context):
@@ -515,7 +515,7 @@ else:
     from firebase_functions.https_fn import on_request
     from werkzeug.wrappers import Request
     from vellox import Vellox
-    from crawler_kit.entrypoints.http.starlette import app
+    from crawler_kit.entrypoints.http import app
     from crawler_kit.utils.asyncio import ensure_event_loop
 
     vellox = Vellox(
