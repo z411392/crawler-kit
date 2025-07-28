@@ -2,7 +2,7 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     from os.path import exists
     from os import environ
-    from crawler_kit.entrypoints.cli.typer import app
+    from crawler_kit.entrypoints.cli import app
 
     environ["RUN_MODE"] = "cli"
 
@@ -16,7 +16,7 @@ else:
     from firebase_functions.https_fn import on_request
     from werkzeug.wrappers import Request
     from vellox import Vellox
-    from crawler_kit.entrypoints.http.starlette import app
+    from crawler_kit.entrypoints.http import app
     from crawler_kit.utils.asyncio import ensure_event_loop
 
     vellox = Vellox(
