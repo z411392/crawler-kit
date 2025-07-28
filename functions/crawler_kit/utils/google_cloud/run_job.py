@@ -13,13 +13,14 @@ def run_job(
 ):
     if is_emulating():
         process = Popen(["python", "main.py", *args], stdout=PIPE, text=True)
-        for line in process.stdout:
-            print(line, end="")
+        stdout, stderr = process.communicate()
+        if stdout:
+            print(stdout, end="")
         if process.returncode == 0:
             return
-        if process.stderr is None:
+        if stderr is None:
             return
-        raise Exception(process.stderr)
+        raise Exception(stderr)
 
     jobs_client = JobsClient(credentials=credentials_from_env())
     job_name = "worker"
