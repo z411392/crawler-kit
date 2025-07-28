@@ -17,7 +17,7 @@ else:
     from werkzeug.wrappers import Request
     from vellox import Vellox
     from crawler_kit.entrypoints.http.starlette import app
-    from crawler_kit.entrypoints.utils.asyncio import ensure_event_loop
+    from crawler_kit.utils.asyncio import ensure_event_loop
 
     vellox = Vellox(
         app=app,
@@ -34,7 +34,7 @@ else:
         MessagePublishedData,
     )
     from os import getenv
-    from crawler_kit.entrypoints.utils.google_cloud.run_job import run_job
+    from crawler_kit.utils.google_cloud.run_job import run_job
 
     @on_message_published(topic=f"projects/{getenv('PROJECT_ID')}/topics/test")
     def on_test_message_received(

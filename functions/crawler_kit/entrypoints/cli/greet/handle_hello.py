@@ -1,5 +1,5 @@
 from click.core import Context
-from crawler_kit.entrypoints.utils.google_cloud.publish_message import publish_message
+from crawler_kit.utils.google_cloud.publish_message import publish_message
 
 def handle_hello(context: Context):
     topic = "test"

@@ -1,5 +1,5 @@
 from google.cloud.pubsub import PublisherClient
-from crawler_kit.entrypoints.utils.google_cloud.credentials_from_env import credentials_from_env
+from crawler_kit.utils.google_cloud.credentials_from_env import credentials_from_env
 from json import dumps
 from asyncio import Future
 from google.api_core.exceptions import AlreadyExists
