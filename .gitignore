@@ -6,3 +6,4 @@ venv
 .env
 .env.local
 *.log
+.history
