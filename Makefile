@@ -34,4 +34,4 @@ tree:
 	@tree -I 'build|__pycache__|*.egg-info|venv|.venv|*.log'
 
 freeze:
-	@uv pip compile pyproject.toml --extra firebase > functions/requirements.txt
+	@uv pip compile pyproject.toml --extra firebase > src/requirements.txt

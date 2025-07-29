@@ -61,4 +61,4 @@ norecursedirs = [
 python_files = [
   "test_*.py",
 ]
-pythonpath = ["./functions"]
+pythonpath = ["./src"]
