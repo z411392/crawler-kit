@@ -16,12 +16,4 @@ if __name__ == "__main__":
 
 else:
     from crawler_kit.entrypoints.pubsub.on_test_message_received import *  # noqa: F403
-    from firebase_functions.https_fn import on_request
-    from crawler_kit.utils.asyncio import ensure_event_loop
-    from crawler_kit.entrypoints.http.handle_admin_bff_request import (
-        vellox as admin_bff,
-    )
-
-    @on_request()
-    def handle_admin_bff_request(request):
-        return ensure_event_loop().run_until_complete(admin_bff(request))
+    from crawler_kit.entrypoints.http.admin import admin  # noqa: F401
