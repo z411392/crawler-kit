@@ -80,8 +80,8 @@ rm firestore.rules
 ### Initialize `venv`
 
 ```bash
-uv venv -p 3.13 functions/venv
-source functions/venv/bin/activate
+uv venv -p 3.13 src/venv
+source src/venv/bin/activate
 ```
 
 ### Make `.vscode` Recognize the Virtual Environment
@@ -90,8 +90,8 @@ Create [`.vscode/settings.json`](./.vscode/settings.json):
 
 ```json
 {
-    "python.venvPath": "functions/venv",
-    "python.defaultInterpreterPath": "functions/venv/bin/python"
+    "python.venvPath": "src/venv",
+    "python.defaultInterpreterPath": "src/venv/bin/python"
 }
 ```
 
@@ -99,7 +99,7 @@ Create [`.vscode/settings.json`](./.vscode/settings.json):
 
 -   Add a new `pyproject.toml`
 -   Add `venv`, `*egg-info` and `requirements.txt` to `.gitignore`
--   Merge `functions/.gitignore` into the root `.gitignore`, then delete the `functions/.gitignore`
+-   Merge `src/.gitignore` into the root `.gitignore`, then delete the `src/.gitignore`
 
 ### Install Dependencies
 
@@ -107,9 +107,9 @@ Create [`.vscode/settings.json`](./.vscode/settings.json):
 make install
 ```
 
-### Generate [requirements.txt](./functions/requirements.txt)
+### Generate [requirements.txt](./src/requirements.txt)
 
-Since Firebase Functions still expects `functions/requirements.txt`, we need to manually generate this file:
+Since Firebase Functions still expects `src/requirements.txt`, we need to manually generate this file:
 
 ```bash
 make freeze
@@ -117,14 +117,14 @@ make freeze
 
 ## CLI Structure for Implementation Project
 
-### Add [functions/.env](./functions/.env) and [functions/.env.local](./functions/.env.local)
+### Add [src/.env](./src/.env) and [src/.env.local](./src/.env.local)
 
 -   Do **not** commit these files into the repository.
 -   These files **must** exist in the directory during deployment.
 -   `.env.local` will be loaded when using Firebase Functions Emulator, but **not** in production.
 
 ```.env
-# functions/.env
+# src/.env
 TZ=Asia/Taipei
 PROJECT_ID=
 PRIVATE_KEY=
@@ -140,7 +140,7 @@ HMAC_SIGNING_KEY=
 ```
 
 ```.env
-# functions/.env.local
+# src/.env.local
 PUBSUB_EMULATOR_HOST=localhost:8085
 ```
 
@@ -170,13 +170,13 @@ def callback(context: Context):
 app = Typer(callback=callback)
 ```
 
-We use `ensure_event_loop` to prepare for running async functions.
+We use `ensure_event_loop` to prepare for running async src.
 
 ---
 
 ### Add Your First CLI Command
 
-1. Create [`typer/greet/__init__.py`](./functions/crawler_kit/entrypoints/cli/typer/greet/__init__.py):
+1. Create [`typer/greet/__init__.py`](./src/crawler_kit/entrypoints/cli/typer/greet/__init__.py):
 
 ```python
 from typer import Typer
@@ -184,7 +184,7 @@ from typer import Typer
 greet = Typer(name="greet")
 ```
 
-2. Implement [`modules/greet/presentation/cli/handlers/handle_hello.py`](./functions/crawler_kit/modules/greet/presentation/cli/handlers/handle_hello.py):
+2. Implement [`modules/greet/presentation/cli/handlers/handle_hello.py`](./src/crawler_kit/modules/greet/presentation/cli/handlers/handle_hello.py):
 
 ```python
 from click.core import Context
@@ -194,7 +194,7 @@ def handle_hello(context: Context):
     print("hello, world")
 ```
 
-3. Register the handler in [`typer/greet/__init__.py`](./functions/crawler_kit/entrypoints/cli/typer/greet/__init__.py):
+3. Register the handler in [`typer/greet/__init__.py`](./src/crawler_kit/entrypoints/cli/typer/greet/__init__.py):
 
 ```python
 from typer import Typer
@@ -206,7 +206,7 @@ greet = Typer(name="greet")
 greet.command(name="hello")(handle_hello)
 ```
 
-4. Register the `greet` CLI module in `functions/crawler_kit/entrypoints/cli/typer/__init__.py`:
+4. Register the `greet` CLI module in `src/crawler_kit/entrypoints/cli/typer/__init__.py`:
 
 ```python
 from typer import Typer
@@ -230,7 +230,7 @@ app.add_typer(greet)
 ### Run the CLI
 
 ```bash
-python functions/main.py greet hello
+python src/main.py greet hello
 ```
 
 Here's the English translation of your guide:
@@ -239,7 +239,7 @@ Here's the English translation of your guide:
 
 ## Publish Message Demo
 
-### Create [`utils/google_cloud/publish_message.py`](./functions/crawler_kit/utils/google_cloud/publish_message.py):
+### Create [`utils/google_cloud/publish_message.py`](./src/crawler_kit/utils/google_cloud/publish_message.py):
 
 ```python
 from google.cloud.pubsub import PublisherClient
@@ -263,7 +263,7 @@ def publish_message(topic: str, payload: dict):
     return future.result()
 ```
 
-### Implementation of [`credentials_from_env`](./functions/crawler_kit/utils/google_cloud/credentials_from_env.py):
+### Implementation of [`credentials_from_env`](./src/crawler_kit/utils/google_cloud/credentials_from_env.py):
 
 ```python
 from google.oauth2.service_account import Credentials
@@ -282,7 +282,7 @@ def credentials_from_env():
     return credentials
 ```
 
-### Slight modification to [`modules/greet/presentation/cli/handlers/handle_hello.py`](./functions/crawler_kit/modules/greet/presentation/cli/handlers/handle_hello.py):
+### Slight modification to [`modules/greet/presentation/cli/handlers/handle_hello.py`](./src/crawler_kit/modules/greet/presentation/cli/handlers/handle_hello.py):
 
 ```python
 from click.core import Context
@@ -307,7 +307,7 @@ make dev
 ### Run the test
 
 ```bash
-python functions/main.py greet hello
+python src/main.py greet hello
 ```
 
 If it runs successfully, you'll see a number in the output. That number is the message ID assigned by the emulator. If the emulator is restarted, it will reset the counter.
@@ -318,7 +318,7 @@ Here's the English translation of your content:
 
 ## Subscribe to a Topic via Firebase Function
 
-Add the following to `functions/main.py`:
+Add the following to `src/main.py`:
 
 ```python
 else:
@@ -336,7 +336,7 @@ else:
         print(event.data.message.json)
 ```
 
-📝 **Note:** After the emulator starts, it will import the functions from `functions/main.py` to run them.
+📝 **Note:** After the emulator starts, it will import the src from `src/main.py` to run them.
 You can simply think of `__name__ != "__main__"` as the condition when `main.py` is executed _inside_ the emulator.
 
 At this point, `.env` and `.env.local` will be loaded automatically by the emulator and production environments.
@@ -347,7 +347,7 @@ They are ignored from the file system, so you **do not need to** and **should no
 ### ✅ Verification
 
 ```python
-python functions/main.py greet hello
+python src/main.py greet hello
 ```
 
 You should see output like:
@@ -358,7 +358,7 @@ You should see output like:
 
 ## Simulating and Running a Cloud Run Job
 
-### Add [`utils/environments.py`](./functions/crawler_kit/utils/environments.py)
+### Add [`utils/environments.py`](./src/crawler_kit/utils/environments.py)
 
 ```python
 from os import getenv, environ
@@ -381,7 +381,7 @@ def is_cli():
 
 ```
 
-### Add [`utils/google_cloud/run_job.py`](./functions/crawler_kit/utils/google_cloud/run_job.py)
+### Add [`utils/google_cloud/run_job.py`](./src/crawler_kit/utils/google_cloud/run_job.py)
 
 ```python
 from crawler_kit.utils.environments import is_emulating
@@ -426,7 +426,7 @@ def run_job(
 
 > You must manually set `job_name = "worker"` and `location = "us-central1"` to match your configuration.
 
-Modify the Firebase Function in `functions/main.py` to execute a Cloud Run job:
+Modify the Firebase Function in `src/main.py` to execute a Cloud Run job:
 
 ```python
 else:
@@ -447,7 +447,7 @@ else:
 
 ### Add the corresponding command
 
-#### [`modules/greet/presentation/cli/handlers/handle_world.py`](./functions/crawler_kit/modules/greet/presentation/cli/handlers/handle_world.py)
+#### [`modules/greet/presentation/cli/handlers/handle_world.py`](./src/crawler_kit/modules/greet/presentation/cli/handlers/handle_world.py)
 
 ```python
 from click.core import Context
@@ -457,7 +457,7 @@ def handle_world(context: Context, message: str):
     print(message)
 ```
 
-#### [`typer/greet/__init__.py`](./functions/crawler_kit/entrypoints/cli/typer/greet/__init__.py)
+#### [`typer/greet/__init__.py`](./src/crawler_kit/entrypoints/cli/typer/greet/__init__.py)
 
 ```python
 from typer import Typer
@@ -476,12 +476,12 @@ greet.command(name="world")(handle_world)
 ### Verification
 
 ```bash
-python functions/main.py greet hello
+python src/main.py greet hello
 ```
 
 ## Add HTTP Endpoint
 
-### Add [http/starlette/__init__.py](./functions/crawler_kit/entrypoints/http/starlette/__init__.py)
+### Add [http/starlette/__init__.py](./src/crawler_kit/entrypoints/http/starlette/__init__.py)
 
 ```python
 from starlette.applications import Starlette
@@ -508,7 +508,7 @@ app = Starlette(
 )
 ```
 
-### Register the request handler in `functions/main.py`
+### Register the request handler in `src/main.py`
 
 ```python
 else:
