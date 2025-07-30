@@ -14,7 +14,7 @@ def publish_message(topic: Topic, payload: dict):
             request=dict(name=name),
         )
     except AlreadyExists:
-        pass
+        print(f"topic {name} already exists")
     data = bytes(dumps(payload), "utf-8")
     future: Future = pubsub.publish(name, data)
     return future.result()

@@ -16,4 +16,5 @@ if __name__ == "__main__":
 
 else:
     from crawler_kit.entrypoints.pubsub.on_test_message_received import *  # noqa: F403
+    from crawler_kit.entrypoints.pubsub.on_pchome_message_received import *  # noqa: F403
     from crawler_kit.entrypoints.http.admin import admin  # noqa: F401
