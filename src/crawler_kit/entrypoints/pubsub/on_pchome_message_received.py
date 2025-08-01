@@ -11,4 +11,4 @@ from crawler_kit.modules.general.enums.topic import Topic
 def handle_run_job_on_pchome_message_received(
     event: CloudEvent[MessagePublishedData],
 ):
-    run_job("crawlers", "message", event.data.message.json["url"])
+    pass
