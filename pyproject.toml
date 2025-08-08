@@ -25,8 +25,10 @@ cli = [
   "firebase-admin",
   "typer",
   "pyppeteer",
+  "seleniumbase",
   "uvicorn",
   "starlette",
+  "ddddocr"
 ]
 
 dev = [
