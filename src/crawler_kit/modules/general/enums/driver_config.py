@@ -5,21 +5,21 @@ from fake_useragent import UserAgent
 class DriverConfig(Dict, Enum):
     Ebay = {
         "browser": "chrome",
-        "headless": False,
+        "headless": True,
         "proxy": None,
         "window_size": "1920,1080",
     }
 
     Amazon = {
         "browser": "chrome",
-        "headless": False,
+        "headless": True,
         "proxy": None,
         "window_size": "1920,1080",
     }
 
     Lazada = {
         "browser": "chrome",
-        "headless": False,
+        "headless": True,
         "proxy": None,
         "window_size": "1920,1080",
         "chromium_arg": "ignore-certificate-errors-spki-list,enable-features=AllowCrossOriginAuth",

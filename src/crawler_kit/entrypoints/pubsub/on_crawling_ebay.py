@@ -8,7 +8,7 @@ from crawler_kit.modules.general.enums.topic import Topic
 
 
 @on_message_published(topic=str(Topic.Ebay))
-def handle_run_job_on_test_message_received(
+def handle_crawl_ebay(
     task: CloudEvent[MessagePublishedData],
 ):
     run_job("ebay", "web", task.data.message.json["url"])
