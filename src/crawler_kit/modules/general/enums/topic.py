@@ -3,11 +3,11 @@ from os import getenv
 
 
 class Topic(str, Enum):
-    Test = "test"
-    Pchome = "pchome"
-    Ebay = "ebay"
-    Amazon = "amazon"
-    Lazada = "lazada"
+    Test = "Test"
+    Pchome = "Pchome"
+    Ebay = "Ebay"
+    Amazon = "Amazon"
+    Lazada = "Lazada"
 
     def __str__(self):
         return f"projects/{getenv('PROJECT_ID')}/topics/{self.value}"

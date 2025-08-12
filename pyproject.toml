@@ -11,6 +11,8 @@ dependencies = [
   "google-cloud-pubsub",
   "google-cloud-run",
   "pybase62",
+  "shortuuid",
+  "fake-useragent",
 ]
 
 [project.optional-dependencies]

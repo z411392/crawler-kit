@@ -1,4 +1,5 @@
 export UV_PROJECT_ENVIRONMENT=src/venv
+export IMAGE_REPOSITORY=asia-east1-docker.pkg.dev/crawler-kit/crawler-kit/test
 
 .PHONY: \
 	dev \
@@ -8,9 +9,9 @@ export UV_PROJECT_ENVIRONMENT=src/venv
 	deploy \
 	install \
 	tree \
-	freeze
-
-
+	freeze \
+	build \
+	push
 
 format:
 	@uvx ruff format .
@@ -35,3 +36,9 @@ tree:
 
 freeze:
 	@uv pip compile pyproject.toml --extra firebase > src/requirements.txt
+
+push:
+	@docker push $(IMAGE_REPOSITORY):latest
+
+build:
+	@docker build --platform=linux/amd64 . -t $(IMAGE_REPOSITORY):latest
