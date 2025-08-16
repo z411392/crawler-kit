@@ -13,6 +13,7 @@ dependencies = [
   "pybase62",
   "shortuuid",
   "fake-useragent",
+  "aiohttp",
 ]
 
 [project.optional-dependencies]
@@ -30,7 +31,6 @@ cli = [
   "seleniumbase",
   "uvicorn",
   "starlette",
-  "ddddocr"
 ]
 
 dev = [

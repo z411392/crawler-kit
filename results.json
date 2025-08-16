@@ -1,0 +1,29 @@
+[
+    {
+        "platform": "web",
+        "url": "https://www.lazada.com.my/products/pdp-i2108708391.html",
+        "job_id": null,
+        "status": "triggered",
+        "response_time": 0.7343480587005615,
+        "error": null,
+        "timestamp": "2025-08-14T15:58:46.232706"
+    },
+    {
+        "platform": "web",
+        "url": "https://www.lazada.com.my/products/pdp-i4142410081.html",
+        "job_id": null,
+        "status": "triggered",
+        "response_time": 0.733619213104248,
+        "error": null,
+        "timestamp": "2025-08-14T15:58:46.232720"
+    },
+    {
+        "platform": "web",
+        "url": "https://www.lazada.com.my/products/pdp-i4017982292.html",
+        "job_id": null,
+        "status": "triggered",
+        "response_time": 0.7355060577392578,
+        "error": null,
+        "timestamp": "2025-08-14T15:58:46.232724"
+    }
+]

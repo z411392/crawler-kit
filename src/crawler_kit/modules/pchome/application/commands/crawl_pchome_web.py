@@ -5,6 +5,7 @@ from crawler_kit.modules.pchome.application.commands.pchome_storage_service impo
 )
 from prefect import flow, task, get_run_logger
 
+
 class crawl_pchome_web:
     def __init__(self, request_delay: int, trace_id: str):
         self.crawler = PchomeCrawler(request_delay)

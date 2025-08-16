@@ -7,8 +7,8 @@ from crawler_kit.utils.google_cloud.run_job import run_job
 from crawler_kit.modules.general.enums.topic import Topic
 
 
-@on_message_published(topic=str(Topic.Pchome))
-def handle_run_job_on_pchome_message_received(
-    event: CloudEvent[MessagePublishedData],
+@on_message_published(topic=str(Topic.Amazon))
+def handle_crawl_amazon(
+    task: CloudEvent[MessagePublishedData],
 ):
-    pass
+    run_job("amazon", "web", task.data.message.json["url"])

@@ -7,8 +7,8 @@ from crawler_kit.utils.google_cloud.run_job import run_job
 from crawler_kit.modules.general.enums.topic import Topic
 
 
-@on_message_published(topic=str(Topic.Test))
-def handle_run_job_on_test_message_received(
-    event: CloudEvent[MessagePublishedData],
+@on_message_published(topic=str(Topic.Lazada))
+def handle_crawl_lazada(
+    task: CloudEvent[MessagePublishedData],
 ):
-    run_job("greet", "world", event.data.message.json["message"])
+    run_job("lazada", "web", task.data.message.json["url"])

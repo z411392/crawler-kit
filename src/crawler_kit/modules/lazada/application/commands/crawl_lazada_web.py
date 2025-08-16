@@ -1,16 +1,17 @@
-from crawler_kit.modules.ebay.application.commands.ebay_crawler import EbayCrawler
-from crawler_kit.modules.ebay.application.commands.ebay_parser import EbayParser
-from crawler_kit.modules.ebay.application.commands.ebay_storage_service import (
-    EbayStorageService,
+from crawler_kit.modules.lazada.application.commands.lazada_crawler import LazadaCrawler
+from crawler_kit.modules.lazada.application.commands.lazada_parser import LazadaParser
+from crawler_kit.modules.lazada.application.commands.lazada_storage_service import (
+    LazadaStorageService,
 )
 
-from prefect import flow, task, get_run_logger
+from prefect import flow, get_run_logger
+
 
 class crawl_lazada_web:
     def __init__(self, request_delay: int, trace_id: str):
-        self.crawler = handle_lazada_web(request_delay)
-        self.parser = EbayParser()
-        self.storage = EbayStorageService()
+        self.crawler = LazadaCrawler(request_delay)
+        self.parser = LazadaParser()
+        self.storage = LazadaStorageService()
         self.trace_id = trace_id
 
     @flow

@@ -32,7 +32,7 @@ class AmazonStorageService:
             doc_data = {
                 "trace_id": trace_id,
                 "url": url,
-                "content": content,
+                "content": content[:10000],
                 "crawledAt": firestore.SERVER_TIMESTAMP,
                 "status": "success",
                 "contentLen": len(content),

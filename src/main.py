@@ -2,6 +2,7 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     from os.path import exists
     from os import environ
+
     from crawler_kit.entrypoints.cli import typer
 
     environ["RUN_MODE"] = "cli"
@@ -13,9 +14,8 @@ if __name__ == "__main__":
         load_dotenv("src/.env.local", override=True)
 
     typer()
-
 else:
-    # from crawler_kit.entrypoints.pubsub.on_test_message_received import *  # noqa: F403
-    # from crawler_kit.entrypoints.pubsub.on_pchome_message_received import *  # noqa: F403
     from crawler_kit.entrypoints.http.admin import admin  # noqa: F401
     from crawler_kit.entrypoints.pubsub.on_crawling_ebay import *  # noqa: F403
+    from crawler_kit.entrypoints.pubsub.on_crawling_amazon import *  # noqa: F403
+    from crawler_kit.entrypoints.pubsub.on_crawling_lazada import *  # noqa: F403

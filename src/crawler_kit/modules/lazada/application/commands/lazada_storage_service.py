@@ -10,6 +10,7 @@ import shortuuid
 
 logger = logging.getLogger(__name__)
 
+
 class LazadaStorageService:
     def __init__(self):
         self.db = firestore.Client(credentials=credentials_from_env())
