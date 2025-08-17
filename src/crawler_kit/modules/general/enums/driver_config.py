@@ -15,11 +15,11 @@ console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.INFO)
 
 formatter = logging.Formatter(
-    '[%(asctime)s] %(name)s - %(levelname)s: %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    "[%(asctime)s] %(name)s - %(levelname)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
 )
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
+
 
 def get_extension_path():
     current_file = os.path.abspath(__file__)
@@ -36,9 +36,6 @@ def get_extension_path():
     )
 
     if os.path.exists(extension_path):
-        logger.info("=====================================")
-        logger.info(f"Extension path exists: {extension_path}")
-        logger.info("=====================================")
         return os.path.abspath(extension_path)
 
 
@@ -46,7 +43,6 @@ headless = True if getenv("HEADLESS", "") == "True" else False
 
 
 class DriverConfig(Dict, Enum):
-
     Ebay = {
         "browser": "chrome",
         "headless": headless,
@@ -66,7 +62,7 @@ class DriverConfig(Dict, Enum):
         "headless": headless,
         "proxy": None,
         "window_size": "1920,1080",
-        "chromium_arg": f"ignore-certificate-errors-spki-list,enable-features=AllowCrossOriginAuth,--user-data-dir={tempfile.mkdtemp()}",
+        # "chromium_arg": f"ignore-certificate-errors-spki-list,enable-features=AllowCrossOriginAuth,--user-data-dir={tempfile.mkdtemp()}",
         "page_load_strategy": "eager",
         "extension_dir": get_extension_path(),
         "locale_code": "en-US",

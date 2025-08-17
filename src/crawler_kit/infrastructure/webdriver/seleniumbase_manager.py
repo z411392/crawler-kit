@@ -13,7 +13,7 @@ class SeleniumBaseManager:
     @classmethod
     def create_driver(cls, browser, headless, **kwargs) -> Driver:
         driver_options = {"browser": browser, "headless": headless, **kwargs}
-        
+
         start_time = time.time()
         try:
             driver = Driver(uc=True, **driver_options)
@@ -39,8 +39,8 @@ class SeleniumBaseManager:
 
 if __name__ == "__main__":
     with SeleniumBaseManager.get_driver(
-        browser="chrome", 
-        headless=False, 
+        browser="chrome",
+        headless=False,
         window_size="1920,1080",
     ) as driver:
         driver.get(
