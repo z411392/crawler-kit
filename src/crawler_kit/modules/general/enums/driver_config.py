@@ -1,9 +1,7 @@
 from enum import Enum
 from typing import Dict
-from fake_useragent import UserAgent
 from crawler_kit.utils.environments import headless_flag
 from os import getenv
-import tempfile
 import logging
 import os
 
@@ -41,7 +39,6 @@ def get_extension_path():
 
 headless = True if getenv("HEADLESS", "") == "True" else False
 
-
 class DriverConfig(Dict, Enum):
     Ebay = {
         "browser": "chrome",
@@ -62,7 +59,6 @@ class DriverConfig(Dict, Enum):
         "headless": headless,
         "proxy": None,
         "window_size": "1920,1080",
-        # "chromium_arg": f"ignore-certificate-errors-spki-list,enable-features=AllowCrossOriginAuth,--user-data-dir={tempfile.mkdtemp()}",
         "page_load_strategy": "eager",
         "extension_dir": get_extension_path(),
         "locale_code": "en-US",

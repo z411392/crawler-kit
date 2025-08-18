@@ -6,84 +6,73 @@ from crawler_kit.infrastructure.webdriver.seleniumbase_manager import (
     SeleniumBaseManager,
 )
 from crawler_kit.modules.general.enums.driver_config import DriverConfig
+from prefect.cache_policies import NO_CACHE
+from prefect import flow, get_run_logger, task
 
-from prefect import flow, get_run_logger
+
+class CrawlerError(Exception):
+    pass
 
 
 class LazadaCrawler:
-    def __init__(self, request_delay: int):
-        self.browser_options = DriverConfig.Lazada.value
+    def __init__(self, request_delay: int = 10):
         self.request_delay = request_delay
 
-    @flow
+    @flow(name="crawl-lazada-page")
     def crawl_page(self, url: str) -> Optional[str]:
+        logger = get_run_logger()
+        logger.info(f"Start crawl page: {url}")
         try:
-            logger = get_run_logger()
-            with SeleniumBaseManager.get_driver(**self.browser_options) as driver:
-                logger.info(f"start load page {url}")
-                driver.get(url)
-                self._smart_wait(driver, max_wait_time=50, check_interval=10)
-
-                content = driver.page_source
-                return content
+            content = self._fetch_page_content(url)
+            logger.info(f"Successfully crawled page: {url}")
+            return content
+        except CrawlerError as e:
+            logger.error(f"Crawler error for {url}: {e}")
+            return None
         except Exception as e:
-            logger.error(f"Error crawling page {url}: {e}")
+            logger.error(f"Unexpected error for {url}: {e}")
             return None
 
-    @flow
-    def _check_for_recaptcha(self, driver) -> bool:
-        try:
-            logger = get_run_logger()
-            logger.info("start check reCAPTCHA...")
+    @task(name="fetch-page-content", cache_policy=NO_CACHE)
+    def _fetch_page_content(self, url: str) -> str:
+        with self._get_driver() as driver:
+            self._load_page(driver, url)
+            self._wait_for_page_ready(driver)
+            return driver.page_source
 
-            current_url = driver.current_url
-            logger.info(f"current URL: {current_url[:100]}...")
-
-            has_punish_url = "punish?x5secdata=" in current_url
-            logger.info(f"URL contains punish?x5secdata=: {has_punish_url}")
-
-            iframes = driver.find_elements(By.TAG_NAME, "iframe")
-            iframe_count = len(iframes)
-            logger.info(f"found {iframe_count} iframe(s)")
-
-            if has_punish_url:
-                logger.info("❌ find reCAPTCHA (punish URL detected), wait longer...")
-                return True
-            elif iframe_count >= 2:
-                logger.info(
-                    "❌ find reCAPTCHA (multiple iframes detected), wait longer..."
-                )
-                return True
-            else:
-                logger.info("✅ no reCAPTCHA detected (normal page)")
-                return False
-
-        except Exception as e:
-            logger.warning(f"error checking reCAPTCHA: {e}")
-            return False
-
-    @flow
-    def _smart_wait(self, driver, max_wait_time: int = 50, check_interval: int = 10):
+    @task(name="load-page", cache_policy=NO_CACHE)
+    def _load_page(self, driver, url: str):
         logger = get_run_logger()
+        logger.info(f"Start load page: {url}")
+        driver.get(url)
         time.sleep(self.request_delay)
-        start_time = time.time()
-        elapsed_time = 0
-        while elapsed_time < max_wait_time:
-            logger.info(
-                f"⏰ Check #{int(elapsed_time / check_interval) + 1} (waited {elapsed_time:.0f}s)"
-            )
 
-            if self._check_for_recaptcha(driver):
-                logger.info(
-                    f"🎯 reCAPTCHA detected! Total wait time: {elapsed_time:.0f}s"
-                )
-                logger.info(f"💤 Waiting {check_interval}s before next check...")
-                time.sleep(check_interval)
-            else:
-                logger.info("✅ no reCAPTCHA detected (normal page)")
-                break
-            elapsed_time = time.time() - start_time
-        time.sleep(random.randint(3, 5))
+    @task(name="wait-for-page-ready", cache_policy=NO_CACHE)
+    def _wait_for_page_ready(self, driver, timeout: int = 60, check_interval: int = 7):
+        logger = get_run_logger()
+
+        for attempt in range(1, timeout // check_interval + 1):
+            logger.info(f"Check page status - attempt {attempt}")
+
+            if not self._has_captcha(driver):
+                logger.info("Page is ready, no CAPTCHA")
+                return
+
+            logger.warning(
+                f"Detected CAPTCHA, waiting {check_interval} seconds before retry..."
+            )
+            time.sleep(check_interval)
+
+        raise CrawlerError("Page failed to load within timeout")
+
+    def _has_captcha(self, driver) -> bool:
+        return (
+            "punish?x5secdata=" in driver.current_url
+            or len(driver.find_elements(By.TAG_NAME, "iframe")) >= 2
+        )
+
+    def _get_driver(self):
+        return SeleniumBaseManager.get_driver(**DriverConfig.Lazada.value)
 
 
 if __name__ == "__main__":

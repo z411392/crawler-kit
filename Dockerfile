@@ -1,7 +1,5 @@
 FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
 
-
-
 RUN set -e && \
     uv venv -p 3.13 && \
     apt-get update && \
